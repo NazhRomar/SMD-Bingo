@@ -3,189 +3,235 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Bingo | SMD Edition</title>
+    <title>Bingo | Premium Edition</title>
     <style>
         :root {
-            --bg-dark: #0f0f0f;
-            --card-bg: #1a1a1a;
+            --bg-dark: #0a0a0c;
+            --card-bg: rgba(30, 30, 35, 0.8);
             --primary-red: #ff3e3e;
             --accent-gold: #ffcf33;
             --win-green: #00e676;
-            --text-main: #efefef;
+            --text-main: #ffffff;
+            --text-dim: #a0a0a5;
+            
+            /* ADJUST CELL SIZES HERE */
+            --cell-size-desktop: 90px;
+            --cell-size-mobile: 72px;
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-family: 'Inter', -apple-system, system-ui, sans-serif;
             background-color: var(--bg-dark);
+            background-image: radial-gradient(circle at 50% 0%, #1a1a2e 0%, transparent 50%);
             color: var(--text-main);
             display: flex;
             flex-direction: column;
             align-items: center;
             margin: 0;
-            padding: 5px; /* Minimal padding for maximum screen use */
-            height: 100vh;
-            overflow: hidden;
+            padding: 10px;
+            min-height: 100vh;
         }
 
-        /* Entrance Modal Styling */
+        /* Entrance Modal */
         #modal-overlay {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.95);
+            inset: 0;
+            background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(8px);
             display: flex;
             justify-content: center;
             align-items: center;
             z-index: 1000;
-            padding: 20px;
-            box-sizing: border-box;
-            text-align: center;
         }
 
         .modal-content {
-            background: var(--card-bg);
-            padding: 30px 20px;
-            border-radius: 15px;
-            border: 2px solid var(--primary-red);
-            max-width: 400px;
-        }
-
-        .modal-content p {
-            font-size: 1.2rem;
-            margin-bottom: 20px;
-            line-height: 1.5;
+            background: #1a1a1a;
+            padding: 30px;
+            border-radius: 20px;
+            border: 1px solid var(--primary-red);
+            text-align: center;
         }
 
         .modal-btn {
             background: var(--primary-red);
             color: white;
             border: none;
-            padding: 12px 25px;
-            border-radius: 8px;
+            padding: 12px 30px;
+            border-radius: 50px;
             font-weight: bold;
-            font-size: 1rem;
             cursor: pointer;
         }
 
-        /* Header logic */
-        h1 {
-            font-family: 'Arial Black', sans-serif;
-            color: var(--primary-red);
-            font-size: clamp(1.5rem, 7vw, 2.5rem);
-            margin: 5px 0 10px 0; /* Minimal top margin */
-            letter-spacing: 4px;
-            text-transform: uppercase;
+        /* Header */
+        header { text-align: center; margin-bottom: 20px; }
+        h1 { 
+            font-size: 2.5rem; 
+            margin: 0; 
+            letter-spacing: 5px; 
+            background: linear-gradient(#fff, var(--primary-red));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
+        .subtitle { font-size: 0.8rem; color: var(--text-dim); text-transform: uppercase; }
 
+        /* BINGO BOARD */
         .bingo-container {
-            width: 100%;
-            max-width: 450px;
-            max-height: 75vh;
-            background-color: var(--card-bg);
-            padding: 6px;
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            box-sizing: border-box;
+            padding: 10px;
+            background: var(--card-bg);
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+            border: 1px solid rgba(255,255,255,0.1);
         }
 
         #grid {
             display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 4px;
-            height: 100%;
+            grid-template-columns: repeat(5, var(--cell-size-desktop));
+            grid-template-rows: repeat(5, var(--cell-size-desktop));
+            gap: 8px;
         }
 
         .cell {
-            aspect-ratio: 1 / 1;
-            background-color: #262626;
-            border-radius: 6px;
+            width: var(--cell-size-desktop);
+            height: var(--cell-size-desktop);
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
             text-align: center;
-            padding: 4px;
-            font-size: clamp(0.5rem, 2.8vw, 0.75rem); 
-            font-weight: 600;
-            line-height: 1.1;
+            padding: 8px;
+            box-sizing: border-box;
+            font-size: 0.85rem; /* Larger font for desktop */
+            font-weight: 500;
             cursor: pointer;
-            user-select: none;
-            color: #ccc;
-            border: 1px solid #333;
-            position: relative;
-            word-break: break-word;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: transform 0.1s, background 0.2s;
+            overflow: hidden;
+            word-wrap: break-word;
         }
 
-        /* High contrast active state for mobile */
-        .cell:active {
-            background-color: #555 !important;
-            transform: scale(0.95);
+        /* MOBILE ADJUSTMENTS */
+        @media (max-width: 500px) {
+            #grid {
+                grid-template-columns: repeat(5, var(--cell-size-mobile));
+                grid-template-rows: repeat(5, var(--cell-size-mobile));
+                gap: 5px;
+            }
+            .cell {
+                width: var(--cell-size-mobile);
+                height: var(--cell-size-mobile);
+                font-size: 0.65rem; /* Smaller font for mobile */
+                padding: 4px;
+            }
+            h1 { font-size: 2rem; }
         }
 
         .cell.marked {
-            background-color: rgba(255, 207, 51, 0.2) !important;
+            background: rgba(255, 207, 51, 0.15);
             color: var(--accent-gold);
-            border-color: var(--accent-gold);
-        }
-
-        .cell.marked::after {
-            content: "✕";
-            position: absolute;
-            font-size: 1.8rem;
-            color: rgba(255, 207, 51, 0.3);
-            pointer-events: none;
+            border: 1px solid var(--accent-gold);
         }
 
         .cell.win-highlight {
-            background-color: var(--win-green) !important;
+            background: var(--win-green) !important;
             color: #000 !important;
-            animation: pulse 0.8s ease-in-out infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(0.96); }
+            box-shadow: 0 0 15px var(--win-green);
         }
 
         .free-space {
-            background-color: #111 !important;
             color: var(--primary-red) !important;
-            border: 1px dashed var(--primary-red);
+            border: 2px dashed var(--primary-red) !important;
             font-weight: 900;
         }
+
+        .cell:active { transform: scale(0.92); }
     </style>
 </head>
 <body>
 
     <div id="modal-overlay">
         <div class="modal-content">
-            <p>Wag po ipakita kay sir hehe thank you - N.</p>
-            <button class="modal-btn" onclick="closeModal()">ok?</button>
+            <p style="color: #eee; margin-bottom: 20px;">Wag po ipakita kay sir hehe thank you - N.</p>
+            <button class="modal-btn" onclick="closeModal()">OK, LET'S PLAY</button>
         </div>
     </div>
 
-    <h1>BINGO</h1>
+    <header>
+        <h1>BINGO</h1>
+        <div class="subtitle">Feb 26, 2026</div>
+    </header>
+
     <div class="bingo-container">
         <div id="grid"></div>
     </div>
 
     <script>
         const masterList = [
-            "Potek!", "My daughter...", "Mr. Antivirus", "Table Tennis Group", "Computer Shop",
-            "\"Kaya niyo, kaya ko rin\"", "Daughter's TikTok", "YouTube Channel", "MySpace",
-            "His wife's family business", "Think before you post", "\"I taught at UA&P\"", 
-            "\"Wag tingin nang tingin sa phone\"", "Yaps about music", "\"Eto experience ko, ah...\"",
-            "Any profanity", "\"Early\" dismissal", "Dubai", "Ateneo",
-            "80,000 / Sweldo ng anak niya", "No boyfriend", "Boyfriend ng asawa ko",
-            "Trabaho ng asawa ko", "Surprise quiz", "Depression / Anxiety", " \"Listen guys!\" "
+
+            "Potek!",
+
+            "My daughter...",
+
+            "Mr. Antivirus",
+
+            "Table Tennis Group",
+
+            "Computer Shop",
+
+            "\"Kaya niyo, kaya ko rin\"",
+
+            "Daughter's TikTok",
+
+            "YouTube Channel",
+
+            "MySpace",
+
+            "His wife's family business",
+
+            "Think before you post",
+
+            "\"I taught at University of Asia & the Pacific\"",
+
+            "\"Wag tingin nang tingin sa phone\"",
+
+            "Yaps about music",
+
+            "\"Eto experience ko, ah...\"",
+
+            "Any profanity",
+
+            "\"Early\" dismissal",
+
+            "Dubai",
+
+            "Ateneo",
+
+            "Salary ng anak niya",
+
+            "No boyfriend",
+
+            "\"Boyfriend ng asawa ko\"",
+
+            "\"Trabaho ng asawa ko\"",
+
+            "Surprise quiz",
+
+            "Depression / Anxiety",
+
+            "\"Ng si hudas ay...\"",
+
+            "Racist Remarks",
+
+            "Crush/Jowa",
+
+            "\"Sino yung lumabas?\""
+
         ];
 
         let boardState = Array(25).fill(false);
+        let hasWon = false;
 
-        function closeModal() {
-            document.getElementById('modal-overlay').style.display = 'none';
-        }
+        function closeModal() { document.getElementById('modal-overlay').style.display = 'none'; }
 
         function shuffle(array) {
             for (let i = array.length - 1; i > 0; i--) {
@@ -198,14 +244,12 @@
         function generateBoard() {
             const grid = document.getElementById('grid');
             grid.innerHTML = '';
-            
             let selectedItems = shuffle([...masterList]).slice(0, 24);
             let itemIdx = 0;
 
             for (let i = 0; i < 25; i++) {
                 const cell = document.createElement('div');
                 cell.className = 'cell';
-                
                 if (i === 12) {
                     cell.innerText = "FREE";
                     cell.classList.add('free-space', 'marked');
@@ -213,7 +257,6 @@
                 } else {
                     cell.innerText = selectedItems[itemIdx++];
                     cell.onclick = () => toggleCell(i);
-                    boardState[i] = false;
                 }
                 grid.appendChild(cell);
             }
@@ -233,21 +276,16 @@
                 [0,5,10,15,20], [1,6,11,16,21], [2,7,12,17,22], [3,8,13,18,23], [4,9,14,19,24],
                 [0,6,12,18,24], [4,8,12,16,20]
             ];
-
             const cells = document.querySelectorAll('.cell');
-            let winDetected = false;
-
             winPatterns.forEach(pattern => {
                 if (pattern.every(index => boardState[index])) {
                     pattern.forEach(index => cells[index].classList.add('win-highlight'));
-                    winDetected = true;
+                    if (!hasWon) {
+                        hasWon = true;
+                        setTimeout(() => alert("BINGO! 🎉"), 300);
+                    }
                 }
             });
-
-            if (winDetected && !window.hasWon) {
-                window.hasWon = true;
-                setTimeout(() => alert("BINGO! 🎉"), 400);
-            }
         }
 
         generateBoard();
